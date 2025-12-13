@@ -1,0 +1,451 @@
+from controller import Principal
+from tkinter import *
+from PIL import ImageTk, Image
+from tkinter import messagebox
+from tkinter import ttk
+
+# principal = Principal()
+# result = principal.adding("Harry", "Potter", "Gryffindor", "1990-07-31", 95.5)
+# print(f"Add result: {result}")
+#
+# students = principal.showing()
+# print(f"Total students: {len(students)}")
+# for student in students:
+#     print(student)
+
+window = Tk()
+window.geometry("900x750")
+window.title("hogwarts portal".upper())
+mobos = ["#9A3B3B", "#1B4242", "#2C3930", "#E2C799", "#643843"]
+colors = ["#E0C9A6", "#F3E5C8", "#DFD0B8", "#F2DAB6", "#4E1F00", "#C08261", "#F7F1E3"]
+window.configure(bg=colors[1])
+
+logo = Image.open(r"C:\Users\ASUS  N580GD\PycharmProjects\Python - Session 2\Final Project\hogwarts2.png")
+photo_logo = ImageTk.PhotoImage(logo)
+
+lbl_logo = Label(window, bg=colors[1])
+lbl_logo.place(x=190, y=15)
+lbl_logo.configure(image=photo_logo)
+
+lbl_name = Label(window, text="user Name:".title(), bg=colors[1], fg=colors[4], font=("Hummus", 30, "bold"))
+lbl_name.place(x=44, y=505)
+lbl_last_name = Label(window, text="password:".title(), bg=colors[1], fg=colors[4], font=("Hummus", 30, "bold"))
+lbl_last_name.place(x=60, y=575)
+
+en1 = Entry(window, font=("Hummus", 28), width=10, bd=5, bg=colors[6], fg="black")
+en1.place(x=278, y=502)
+en2 = Entry(window, font=("Hummus", 28), width=10, bd=5, bg=colors[6], fg="black")
+en2.place(x=278, y=572)
+
+bttn_login = Button(window, text="login".upper(), bg=colors[5], fg="black", font=("Hummus", 25), bd=10, width=9)
+bttn_login.place(x=347, y=642)
+lbl_welcome = Label(window, text="Welcome, Professor Dumbledore.", bg=colors[1], fg=colors[4],
+                    font=("Hummus", 33, "bold"))
+
+
+def login():
+    a = en1.get().upper()
+    b = en2.get().upper()
+    # if a == "YOASOBI" and b == "KONOSEKAIWA...":
+    if a == "A" and b == "B":
+        lbl_logo.destroy()
+        lbl_name.destroy()
+        lbl_last_name.destroy()
+        en1.destroy()
+        en2.destroy()
+        bttn_login.destroy()
+        lbl_welcome.place(x=80, y=340)
+        window.after(3000, lambda: (lbl_welcome.destroy(), open_crud_page()))
+    else:
+        messagebox.showwarning("Hogwarts Alert", "Password Or Username Failed!\nThe Ministry Has Been Notified.")
+
+
+def open_crud_page():
+    create_students_list()
+    show_main_bttns()
+
+
+# global Widget References/AI suggestion
+bttn_add_new = None
+bttn_edit = None
+bttn_delete = None
+
+
+def show_main_bttns():
+    global bttn_add_new, bttn_edit, bttn_delete
+
+    bttn_add_new = Button(window, text="add new student".upper(), bg=colors[5]
+                          , fg="black", font=("Hummus", 20), bd=5, width=15, command=lambda: show_add_form())
+    bttn_add_new.place(x=75, y=600)
+    bttn_edit = Button(window, text="EDIT", bg=colors[5], fg="black", font=("Hummus", 20)
+                       , bd=5, width=10, command=editing)
+    bttn_edit.place(x=375, y=600)
+    bttn_delete = Button(window, text="DELETE", bg=colors[5], fg="black"
+                         , font=("Hummus", 20), bd=5, width=10, command=deleting)
+    bttn_delete.place(x=675, y=600)
+
+
+def show_add_form():
+    for widget in window.winfo_children():
+        if isinstance(widget, Button) and widget.cget("text") in ["add new student".upper(), "EDIT", "DELETE", "GO"
+                , "CANCEL"]:
+            widget.place_forget()
+    adding_information()
+
+
+def hide_add_form():
+    for widget in window.winfo_children():
+        if isinstance(widget, Frame) and widget.winfo_y() == 400:
+            widget.destroy()
+    bttn_saving.place_forget()
+    bttn_canceling.place_forget()
+    bttn_searching.place_forget()
+
+
+def show_edit_form():
+    for widget in window.winfo_children():
+        if isinstance(widget, Button) and widget.cget("text") in ["add new student".upper(), "EDIT", "DELETE", "GO"
+                , "CANCEL"]:
+            widget.place_forget()
+    editing_information()
+
+
+bttn_login.configure(command=login)
+
+principal = Principal()
+
+
+def create_students_list():
+    mori = ttk.Treeview(window, show="headings", selectmode='browse', height=12)
+
+    mori['columns'] = ("id", "firstname", "lastname", "house", "birthdate", "score")
+
+    verscrlbar = ttk.Scrollbar(window, orient="vertical", command=mori.yview)
+    verscrlbar.place(x=800, y=40, height=300)
+
+    mori.configure(yscrollcommand=verscrlbar.set)
+
+    mori.column("id", anchor=CENTER, width=70, minwidth=25)
+    mori.column("firstname", anchor=CENTER, width=120, minwidth=25)
+    mori.column("lastname", anchor=CENTER, width=125, minwidth=25)
+    mori.column("house", anchor=CENTER, width=110, minwidth=25)
+    mori.column("birthdate", anchor=CENTER, width=110, minwidth=25)
+    mori.column("score", anchor=CENTER, width=70, minwidth=25)
+
+    mori.heading("id", text="ID", anchor=CENTER)
+    mori.heading("firstname", text="FIRST NAME", anchor=CENTER)
+    mori.heading("lastname", text="LAST NAME", anchor=CENTER)
+    mori.heading("house", text="HOUSE", anchor=CENTER)
+    mori.heading("birthdate", text="BIRTH DATE", anchor=CENTER)
+    mori.heading("score", text="SCORE", anchor=CENTER)
+
+    mori.pack(pady=20, side='top')
+
+    mori.place(x=100, y=40, width=700, height=300)
+
+    students = principal.showing()
+
+    for st in students:
+        bg_color = get_house_background_color(st.house)
+        tag_name = f"house_{st.house.lower()}"
+        mori.insert("", "end", values=(st.id, st.firstname, st.lastname, st.house, st.birth_date, st.score),
+                    tags=(tag_name,))
+        mori.tag_configure(tag_name, background=bg_color)
+
+    style = ttk.Style()
+    style.configure("Treeview", font=("Cinzel", 11, "bold"), rowheight=30)
+    style.configure("Treeview.Heading",
+                    font=("Hummus", 13, "bold"))
+
+
+def get_house_background_color2(house):
+    style_colors = {
+        'Gryffindor': '#F07C79',
+        'Slytherin': '#95E395',
+        'Ravenclaw': '#A7EBFE',
+        'Hufflepuff': '#F8E68F'
+    }
+    return style_colors.get(house, '#FFFFFF')
+
+
+def get_house_background_color(house):
+    # style_colors = {
+    #     'Gryffindor': '#FFE5E5',
+    #     'Slytherin': '#E5F4E5',
+    #     'Ravenclaw': '#E5E9FF',
+    #     'Hufflepuff': '#FFF9E5'
+    # }
+    style_colors = {
+        'Gryffindor': '#FFB3B3',
+        'Slytherin': '#99D699',
+        'Ravenclaw': '#99C2FF',
+        'Hufflepuff': '#FFE699'
+    }
+    return style_colors.get(house, '#FFFFFF')
+
+
+def placeholder(e, b):
+    e.insert(0, b)
+    e.configure(fg="black")
+
+    def focus_in(event):
+        if e.get() == b:
+            e.delete(0, "end")
+            e.configure(fg="black")
+
+    def focus_out(event):
+        if e.get() == "":
+            e.insert(0, b)
+            e.configure(fg="black")
+
+    e.bind("<FocusIn>", focus_in)
+    e.bind("<FocusOut>", focus_out)
+
+
+def adding_information():
+    global first_, last_, house_, birth_, score_
+    variable = StringVar()
+    crud_frame = Frame(window, bg=colors[1])
+    crud_frame.place(x=300, y=400, width=700, height=190)
+
+    first_ = Entry(crud_frame, font=("Hummus", 18), width=9, bd=5, bg=colors[6], fg="black")
+    first_.grid(row=1, column=5)
+    placeholder(first_, "First Name")
+
+    last_ = Entry(crud_frame, font=("Hummus", 18), width=9, bd=5, bg=colors[6], fg="black")
+    last_.grid(row=1, column=6)
+    placeholder(last_, "Last Name")
+    # house_ = Entry(window, font=("Hummus", 28), width=10, bd=5, bg=colors[6], fg="black")
+    house_ = ttk.Combobox(crud_frame, textvariable=variable, state="readonly",
+                          values=["Gryffindor", "Slytherin", "Ravenclaw", "Hufflepuff"], font=("Hummus", 18), width=8)
+    house_.grid(row=2, column=5)
+    house_.set("Choose House")
+
+    birth_ = Entry(crud_frame, font=("Cinzel", 20), width=12, bd=5, bg=colors[6], fg="black")
+    birth_.grid(row=2, column=6)
+    placeholder(birth_, "Birth Date")
+
+    score_ = Entry(crud_frame, font=("Cinzel", 20), width=12, bd=5, bg=colors[6], fg="black")
+    score_.grid(row=3, column=5)
+    placeholder(score_, "Score")
+
+    bttn_saving.place(x=300, y=610)
+    bttn_saving.configure(command=add_student)
+    bttn_canceling.place(x=500, y=610)
+    bttn_canceling.configure(command=canceling)
+
+
+def add_student():
+    f = first_.get().strip()
+    l = last_.get().strip()
+    h = house_.get().strip()
+    b = birth_.get().strip()
+    s = score_.get().strip()
+
+    if f == "First Name" or l == "Last Name" or b == "Birth Date" or h == "Choose House":
+        messagebox.showerror("Hogwarts Alert", "fields cannot be empty".title())
+        return
+
+    try:
+        s = float(s) if s else 0.0
+    except ValueError:
+        messagebox.showwarning("Hogwarts Alert", "Score must be number!")
+        return
+
+    if principal.adding(first_name=f, last_name=l, house=h, birth_date=b, score=s):
+        hide_add_form()
+
+        for widget in window.winfo_children():
+            if isinstance(widget, ttk.Treeview):
+                widget.destroy()
+        create_students_list()
+
+        success_label = Label(window, text="Student Added Successfully!",
+                              bg=colors[1], fg=colors[4], font=("Hummus", 20, "bold"))
+        success_label.place(x=280, y=610)
+        window.after(2000, lambda: (success_label.destroy(), show_main_bttns()))
+
+    else:
+        messagebox.showwarning("Hogwarts Alert", "Failed To Add student to database!".title())
+
+
+def canceling():
+    hide_add_form()
+    show_main_bttns()
+
+
+id_box = None
+
+
+def editing():
+    global id_box
+    for widget in window.winfo_children():
+        if isinstance(widget, Button) and widget.cget("text") in ["add new student".upper(), "EDIT", "DELETE"]:
+            widget.place_forget()
+
+    crud_frame = Frame(window, bg=colors[1])
+    crud_frame.place(x=300, y=400, width=500, height=200)
+    id_box = Entry(crud_frame, font=("Cinzel", 20), width=18, bd=5, bg=colors[6], fg="black")
+    id_box.grid(row=1, column=1)
+    placeholder(id_box, "Enter Student's ID")
+
+    bttn_searching.place(x=300, y=610)
+    bttn_searching.configure(command=go_editing, text="GO", bg="#4CAF50", fg="white")
+    bttn_canceling.place(x=500, y=610)
+    bttn_canceling.configure(command=canceling)
+
+
+id_ = None
+
+
+def go_editing():
+    global id_
+    id_ = id_box.get().strip()
+
+    if id_ == "Enter Student's ID":
+        messagebox.showerror("Hogwarts Alert", "Please enter Student ID!")
+        return
+
+    student_id = principal.get_id(id_)
+    if not student_id:
+        messagebox.showerror("Hogwarts Alert", f"Student with ID {id_} not found!")
+        return
+    show_edit_form()
+
+
+def editing_information():
+    global first_, last_, house_, birth_, score_
+    variable = StringVar()
+    crud_frame = Frame(window, bg=colors[1])
+    crud_frame.place(x=300, y=400, width=700, height=190)
+
+    first_ = Entry(crud_frame, font=("Hummus", 18), width=9, bd=5, bg=colors[6], fg="black")
+    first_.grid(row=1, column=5)
+    placeholder(first_, "First Name")
+
+    last_ = Entry(crud_frame, font=("Hummus", 18), width=9, bd=5, bg=colors[6], fg="black")
+    last_.grid(row=1, column=6)
+    placeholder(last_, "Last Name")
+    house_ = ttk.Combobox(crud_frame, textvariable=variable, state="readonly",
+                          values=["Gryffindor", "Slytherin", "Ravenclaw", "Hufflepuff"], font=("Hummus", 18), width=8)
+    house_.grid(row=2, column=5)
+    house_.set("Choose House")
+
+    birth_ = Entry(crud_frame, font=("Cinzel", 20), width=12, bd=5, bg=colors[6], fg="black")
+    birth_.grid(row=2, column=6)
+    placeholder(birth_, "Birth Date")
+
+    score_ = Entry(crud_frame, font=("Cinzel", 20), width=12, bd=5, bg=colors[6], fg="black")
+    score_.grid(row=3, column=5)
+    placeholder(score_, "Score")
+
+    bttn_saving.place(x=300, y=610)
+    bttn_saving.configure(command=edit_student)
+    bttn_canceling.place(x=500, y=610)
+    bttn_canceling.configure(command=canceling)
+
+
+def edit_student():
+    f = first_.get().strip()
+    l = last_.get().strip()
+    h = house_.get().strip()
+    b = birth_.get().strip()
+    s = score_.get().strip()
+
+    if f == "First Name" or l == "Last Name" or b == "Birth Date" or h == "Choose House":
+        messagebox.showerror("Hogwarts Alert", "fields cannot be empty".title())
+        return
+
+    try:
+        s = float(s) if s else 0.0
+    except ValueError:
+        messagebox.showwarning("Hogwarts Alert", "Score must be number!")
+        return
+
+    if principal.updating(id_=id_, first_name=f, last_name=l, house=h, birth_date=b, score=s):
+        hide_add_form()
+
+        for widget in window.winfo_children():
+            if isinstance(widget, ttk.Treeview):
+                widget.destroy()
+        create_students_list()
+
+        success_label = Label(window, text="Student Edited Successfully!",
+                              bg=colors[1], fg=colors[4], font=("Hummus", 20, "bold"))
+        success_label.place(x=280, y=610)
+        window.after(2000, lambda: (success_label.destroy(), show_main_bttns()))
+
+    else:
+        messagebox.showwarning("Hogwarts Alert", "Failed To edit student to database!".title())
+
+
+def deleting():
+    global id_box
+    for widget in window.winfo_children():
+        if isinstance(widget, Button) and widget.cget("text") in ["add new student".upper(), "EDIT", "DELETE"]:
+            widget.place_forget()
+
+    crud_frame = Frame(window, bg=colors[1])
+    crud_frame.place(x=300, y=400, width=500, height=200)
+    id_box = Entry(crud_frame, font=("Cinzel", 20), width=18, bd=5, bg=colors[6], fg="black")
+    id_box.grid(row=1, column=1)
+    placeholder(id_box, "Enter Student's ID")
+
+    bttn_searching.place(x=300, y=610)
+    bttn_searching.configure(command=go_deleting, text="DELETE", bg="#FFC107", fg="black")
+    bttn_canceling.place(x=500, y=610)
+    bttn_canceling.configure(command=canceling)
+
+
+def go_deleting():
+    global id_
+    id_ = id_box.get().strip()
+
+    if id_ == "Enter Student's ID":
+        messagebox.showerror("Hogwarts Alert", "Please enter Student ID!")
+        return
+
+    student_id = principal.get_student(id_)
+    if not student_id:
+        messagebox.showerror("Hogwarts Alert", f"Student with ID {id_} not found!")
+        return
+
+    result = confirming(student_id['firstname'], student_id['lastname'])
+
+    if result:
+        if principal.deleting(id_):
+            for widget in window.winfo_children():
+                if isinstance(widget, Frame) and widget.winfo_y() == 400:
+                    widget.destroy()
+            bttn_saving.place_forget()
+            bttn_canceling.place_forget()
+            bttn_searching.place_forget()
+
+            for widget in window.winfo_children():
+                if isinstance(widget, ttk.Treeview):
+                    widget.destroy()
+            create_students_list()
+
+            success_label = Label(window, text="Student Deleted Successfully!",
+                                  bg=colors[1], fg=colors[4], font=("Hummus", 20, "bold"))
+            success_label.place(x=280, y=610)
+            window.after(2000, lambda: (success_label.destroy(), show_main_bttns()))
+
+        else:
+            messagebox.showwarning("Hogwarts Alert", "Failed To delete student to database!".title())
+
+
+def confirming(student_name, student_lastname):
+    result = messagebox.askyesno("Confirm Delete", f"Are you sure you want to delete\n{student_name} "
+                                                  f"{student_lastname}?\n\nThis action cannot be undone!")
+    return result
+
+
+bttn_saving = Button(window, text="SAVE", bg="#4CAF50", fg="white"
+                     , font=("Hummus", 18), bd=5, width=8)
+bttn_canceling = Button(window, text="CANCEL", bg="#F44336", fg="white"
+                        , font=("Hummus", 18), bd=5, width=8)
+bttn_searching = Button(window, text="GO", bg="#4CAF50", fg="white"
+                        , font=("Hummus", 18), bd=5, width=8)
+
+window.mainloop()
