@@ -1,0 +1,102 @@
+from model import Student, RobotFactory
+from sqlalchemy.exc import SQLAlchemyError
+
+
+class Principal:
+
+    def adding(self, first_name, last_name, house, birth_date, score):
+        yoasobi = RobotFactory()
+        try:
+            new_student = Student(firstname=first_name, lastname=last_name, house=house, birth_date=birth_date
+                                  , score=score)
+            yoasobi.add(new_student)
+            yoasobi.commit()
+            print(f"Student added: {first_name} {last_name}")
+            return True
+        except SQLAlchemyError as error:
+            yoasobi.rollback()
+            print(f"Database error in adding: {error}")
+            return False
+        finally:
+            yoasobi.close()
+
+    def get_id(self, id_):
+        try:
+            yoasobi = RobotFactory()
+            student = yoasobi.query(Student).filter(Student.id == id_).first()
+            if student:
+                return True
+            else:
+                return False
+        except SQLAlchemyError as error:
+            yoasobi.rollback()
+            print(f"Database error in adding: {error}")
+            return False
+        finally:
+            yoasobi.close()
+
+    def get_student(self, id_):
+        yoasobi = RobotFactory()
+        try:
+            student = yoasobi.query(Student).filter(Student.id == id_).first()
+            if student:
+                return {
+                    'id': student.id,
+                    'firstname': student.firstname,
+                    'lastname': student.lastname,
+                    'house': student.house,
+                    'birth_date': student.birth_date,
+                    'score': student.score
+                }
+            else:
+                return False
+        finally:
+            yoasobi.close()
+
+    def updating(self, id_, first_name, last_name, house, birth_date, score):
+        try:
+            yoasobi = RobotFactory()
+            student = yoasobi.query(Student).filter(Student.id == id_).first()
+            if student:
+                student.firstname = first_name
+                student.lastname = last_name
+                student.house = house
+                student.birth_date = birth_date
+                student.score = score
+                yoasobi.commit()
+                return True
+            else:
+                return False
+        except SQLAlchemyError as error:
+            yoasobi.rollback()
+            print(f"Database error in adding: {error}")
+            return False
+        finally:
+            yoasobi.close()
+
+    def deleting(self, id_):
+        try:
+            yoasobi = RobotFactory()
+            student = yoasobi.query(Student).filter(Student.id == id_).first()
+            if student:
+                yoasobi.delete(student)
+                yoasobi.commit()
+                return True
+            else:
+                return False
+        except SQLAlchemyError as error:
+            yoasobi.rollback()
+            print(f"Database error in deleting: {error}")
+            return False
+        finally:
+            yoasobi.close()
+
+    def showing(self):
+        try:
+            yoasobi = RobotFactory()
+            return yoasobi.query(Student).order_by(Student.house, Student.firstname).all()
+        except SQLAlchemyError as error:
+            print(f"Database error in adding: {error}")
+            return []
+        finally:
+            yoasobi.close()
